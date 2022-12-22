@@ -1,0 +1,35 @@
+@startuml sequence_admin_comments
+    actor       Admin       as chef
+    boundary    System    as system
+    database    Database    as data
+
+    chef -> system : Requete d'authentification
+    system -> data : consultation de la base de données
+    system <-- data : Résultats trouvés
+    chef <- system : Authentification reussie
+    chef -> system : écrir un nouveau commentaire
+    system -> data : ajout du nouveau commentaire
+    system <-- data : commentaire ajouté
+    chef <-- system : Renvoi vers le la figure
+
+    chef -> system : Afficher les commentaires
+    system -> data : consultation de la base de données
+    system <-- data : Résultats trouvés
+    chef <-- system : Renvoi vers la page de moderation des commentaires
+    alt Accepter les commentaires
+        chef -> system: Choisir un commentaire
+        system -> data: Consultation des commentaires
+        system <-- data : commentaire trouvé
+        chef <-- system : Visualisation du commentaire
+        chef -> system: Accepter le commentaire
+        system -> data: afficher le commentaire sous l'article
+        system <-- data : commentaire affiché
+        chef <-- system : Confirmation de l'affichage
+    else refuser les commentaires
+        chef -> system: Refuser le commentaire
+        system -> data: supprimer le commentaire
+        system <-- data : commentaire supprimé
+        chef <-- system : Confirmation de la suppression
+
+    end
+@enduml

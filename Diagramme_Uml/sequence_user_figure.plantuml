@@ -1,0 +1,31 @@
+@startuml sequence_user_figure
+    actor       User       as chef
+    boundary    System    as system
+    database    Database    as data
+
+    chef -> system : Requete d'authentification
+    system -> data : consultation de la base de données
+    system <-- data : Résultats trouvés
+    chef <- system : Authentification reussie
+    chef -> system : écrir une nouvelle figure
+    system -> data : ajout de la nouvelle figure
+    system <-- data : figure ajouté
+    chef <-- system : Renvoi vers le menu des figures
+
+    alt Modifier une figure existant de l'utilisateur
+        chef -> system: Choisir une figure existant
+        system -> data: Consultation des figures
+        system <-- data : figure trouvée
+        chef <-- system : Visualisation de la figure
+        chef -> system: modification de la figure
+        system -> data: Enregistement de la figure existant
+        system <-- data : Enregistemnt effectué
+        chef <-- system : Confirmation de l'enregistrement
+        alt supprimer les figures de l'utilisateur
+            chef -> system: supprimer la figure
+            system -> data: Suppression la figure
+            system <-- data : figure supprimée
+            chef <-- system : Confirmation de la suppression
+        end
+    end
+@enduml

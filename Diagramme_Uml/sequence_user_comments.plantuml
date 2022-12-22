@@ -1,0 +1,20 @@
+@startuml sequence_user_comments
+    actor       Admin       as chef
+    boundary    System    as system
+    database    Database    as data
+
+    chef -> system : Requete d'authentification
+    system -> data : consultation de la base de données
+    system <-- data : Résultats trouvés
+    chef <- system : Authentification reussie
+
+    chef -> system : Selectionner une figure
+    system -> data : consultation de la base de données
+    system <-- data : figure trouvés
+    chef <-- system : Renvoi vers la page de la figure
+    chef -> system : écrir un nouveau commentaire
+    system -> data : ajout du nouveau commentaire
+    system <-- data : commentaire ajouté
+    chef <-- system : Renvoi vers le la figure
+
+@enduml
