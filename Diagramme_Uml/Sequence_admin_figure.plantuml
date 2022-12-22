@@ -1,0 +1,42 @@
+@startuml sequence_admin_figure
+    actor       Admin       as chef
+    boundary    System    as system
+    database    Database    as data
+
+    chef -> system : Requete d'authentification
+    system -> data : consultation de la base de données
+    system <-- data : Résultats trouvés
+    chef <- system : Authentification reussie
+    chef -> system : écrir une nouvelle figure
+    system -> data : ajout de la nouvelle figure
+    system <-- data : figure ajouté
+    chef <-- system : Renvoi vers le menu des figures
+
+    alt Modifier une figure existant de l'admin
+        chef -> system: Choisir une figure existant
+        system -> data: Consultation des figures
+        system <-- data : figure trouvée
+        chef <-- system : Visualisation de la figure
+        chef -> system: modification de la figure
+        system -> data: Enregistement de la figure existant
+        system <-- data : Enregistemnt effectué
+        chef <-- system : Confirmation de l'enregistrement
+
+        alt Accepter les figures des autres utilisateurs
+            chef -> system: Choisir une figure
+            system -> data: Consultation des figures
+            system <-- data : figure trouvé
+            chef <-- system : Visualisation de la figure
+            chef -> system: Accepter le figure
+            system -> data: afficher le figure
+            system <-- data : figure affichée
+            chef <-- system : Confirmation de l'affichage
+        else refuser les figures des autres utilisateurs
+            chef -> system: Refuser la figure
+            system -> data: supprimer la figure
+            system <-- data : figure supprimée
+            chef <-- system : Confirmation de la suppression
+
+        end
+    end
+@enduml

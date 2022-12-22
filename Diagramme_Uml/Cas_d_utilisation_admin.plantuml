@@ -1,0 +1,17 @@
+@startuml Cas_d_utilisation_admin
+scale 1
+Left to right direction
+skinparam packageStyle rect
+actor admin
+
+rectangle utilisation_admin{
+(admin) -- (ajouter/modifier/supprimer une figure)
+(admin) -- (Consulter une figure)
+(admin) -- (Consulter la liste des figure)
+(admin) -- (ajouter/valider/supprimer un commentaire)
+
+(ajouter/modifier/supprimer une figure) ..> (authentification) :include
+(ajouter/valider/supprimer un commentaire) ..> (authentification) :include
+}
+@enduml
+
