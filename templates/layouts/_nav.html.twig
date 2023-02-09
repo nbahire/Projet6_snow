@@ -1,31 +1,29 @@
-<nav class="container flex justify-around py-2 mx-auto bg-gray-200">
+<nav class="container flex justify-around py-2 mx-auto bg-gray-300">
     <div class="flex items-center">
-        <h3 class="text-2xl font-medium text-blue-500">LOGO</h3>
+        <h3 class="text-2xl font-medium text-blue-500">Snowtrick</h3>
     </div>
     <!-- left header section -->
     <div class="items-center hidden space-x-8 lg:flex">
-        <a href="">Home</a>
+        <a href="{{path('app_main')}}">Home</a>
         <a href="">About Us</a>
-        <a href="">Blogs</a>
-        <a href="">Our Team</a>
         <a href="">Contact Us</a>
     </div>
     <!-- right header section -->
     <div class="flex items-center space-x-2">
         {% if app.user %}
             <a href="{{path('app_logout')}}">
-                <button class="px-4 py-2 text-blue-100 bg-blue-800 rounded-md">
+                <button class="px-4 py-2 text-red-100 bg-red-800 rounded-md">
                     logout
                 </button>
             </a>
         {% else %}
             <a href="{{path('app_login')}}">
-                <button class="px-4 py-2 text-blue-100 bg-blue-800 rounded-md">
+                <button class="px-4 py-2 text-blue-100 bg-blue-400 rounded-md">
                     Sign in
                 </button>
             </a>
             <a href="{{path('app_register')}}">
-                <button class="px-4 py-2 text-gray-200 bg-gray-400 rounded-md">
+                <button class="px-4 py-2 text-gray-200 bg-orange-200 rounded-md">
                     Sign up
                 </button>
             </a>

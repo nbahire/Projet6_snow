@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\traits\Timestamp;
 use App\Repository\CommentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,6 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
+    use Timestamp;
+
+    public function __construct(){
+        $this->created_at = new \DateTimeImmutable();
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -23,6 +29,9 @@ class Comment
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comment')]
+    private ?Trick $trick = null;
 
     public function getId(): ?int
     {
@@ -52,15 +61,14 @@ class Comment
 
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getTrick(): ?Trick
     {
-        return $this->created_at;
+        return $this->trick;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setTrick(?Trick $trick): self
     {
-        $this->created_at = $created_at;
+        $this->trick = $trick;
 
         return $this;
     }
