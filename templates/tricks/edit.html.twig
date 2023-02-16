@@ -1,3 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}SnowTrick : Pour les passionnés de la glisse{% endblock %}
+
+{% block content %}
+    {{form_start(form)}}
+     {{ form_row(form.title) }}
+        {{ form_row(form.chapo) }}
+        {{ form_row(form.content) }}
+    {{form_end(form)}}
+{% endblock %}

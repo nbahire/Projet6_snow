@@ -2,6 +2,8 @@
 
 namespace App\Entity\traits;
 
+use App\Entity\Comment;
+use App\Entity\Trick;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,12 +16,12 @@ trait Timestamp
     /**
      * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
      */
-    private ?\DateTimeInterface $createdAt;
+    private ?\DateTimeInterface $created_at;
 
     /**
      * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
      */
-    private ?\DateTimeInterface $updatedAt;
+    private ?\DateTimeInterface $updated_at;
     /**
      * @return \DateTimeInterface|null
      */
@@ -28,12 +30,12 @@ trait Timestamp
         return $this->createdAt;
     }
     /**
-     * @param \DateTimeInterface $createdAt
+     * @param \DateTimeInterface $created_at
      * @return self
      */
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $created_at): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = $created_at;
 
         return $this;
     }
@@ -42,16 +44,17 @@ trait Timestamp
      */
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updatedAt;
+        return $this->updated_at;
     }
+
     /**
      *
-     * @param \DateTimeInterface $updatedAt
-     * @return self
+     * @param \DateTimeInterface $updated_at
+     * @return Comment|Timestamp|Trick
      */
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
+    public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
-        $this->updatedAt = $updatedAt;
+        $this->updated_at = $updated_at;
 
         return $this;
     }

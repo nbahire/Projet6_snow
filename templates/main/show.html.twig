@@ -32,7 +32,7 @@
 
                             <a href="#" onclick="event.preventDefault(); confirm('Etes-vous sur ?')&& document.getElementById('trick-delete').submit();" class=" btn btn-light ">Supprimer</a>
 
-                            <form id="post-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
+                            <form id="trick-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
                                 <input type="hidden" name="csrf_token" value="{{csrf_token('trick_deletion_'~ trick.id)}}">
                                 <input type="hidden" name="_method" value="DELETE">
                             </form>
@@ -43,26 +43,11 @@
                     {% if app.user %}
                         <div class="reply-box">
 							<span class="commenter-name">
-								<h3>Laisser un commentaire</h3>
 								{{form_start(form)}}
-
-								<div class="mt-4">
-
-									{{form_row(form.content)}}
-
-								</div>
-
-								<button type="submit" class="btn ">Commenter</button>
-
-								{{form_end(form)}}
-
-
-								<button type="cancel" class="btn btn-default reply-popup">Annuler</button>
+								    <button type="submit" class="px-4 py-2 text-blue-100 bg-blue-400 rounded-md" >ydgfydefgudfudefde</button>
+                                {{form_end(form)}}
 							</span>
                         </div>
-                        <span class="add-com">
-							<button type="comment" class="btn  btn-default reply-popup">Ajouter un commentaire</button>
-						</span>
                 {% else %}
                     <p class="mt-5 border">
                         <a href="{{ path('app_login')}}">
@@ -72,10 +57,6 @@
                         pour commenter
                     </p>
                 {% endif %}
-
-
-                <trick-comment data-post="{{post.id}}" data-user="{{app.user ? app.user.id :0}}"></trick-comment>
-
             </article>
 
         </div>

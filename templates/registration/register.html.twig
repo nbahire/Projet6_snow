@@ -4,32 +4,30 @@
 
 {% block body %}
     {{ form_start(registrationForm) }}
-        <div class="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="w-full max-w-md space-y-8">
+        <div class=" flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class=" bg-gray-200 p-6 w-full max-w-md space-y-8 rounded border-2 border-gray-200">
                 <div>
                     <img class="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
-                    <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+                    <h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">Creez votre compte</h2>
                 </div>
                     <input type="hidden" name="remember" value="true">
-                    <div class="-space-y-px rounded-md shadow-sm">
+                    <div class="-space-y-px rounded-md">
                         <div>
-                            {{ form_row(registrationForm.name) }}
+                            {{ form_row(registrationForm.name, { 'attr': {'placeholder' : 'Nom', 'class' : 'appearance-none my-2 border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" id="inline-full-name'}}) }}
                         </div>
                         <div>
-                            {{ form_row(registrationForm.email) }}
+                            {{ form_row(registrationForm.email, { 'attr': {'placeholder' : 'Email', 'class' : 'appearance-none border-2 my-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" id="inline-full-name'}}) }}
                         </div>
                         <div>
-                            {{ form_row(registrationForm.plainPassword, {
-                                label: 'Mon de passe'
-                            }) }}
+                            {{ form_row(registrationForm.plainPassword, { 'attr': {'placeholder' : 'Mot de passe', 'class' : 'appearance-none border-2 border-gray-200 rounded w-full my-2 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" id="inline-full-name'}}) }}
                         </div>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            {{ form_row(registrationForm.agreeTerms) }}
+                            {{ form_row(registrationForm.agreeTerms, { 'attr': {'class' : 'ml-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'}}) }}
                         </div>
                         <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Forgot your password?</a>
+                            <a href="{{path('app_login')}}" class="font-medium text-indigo-600 hover:text-indigo-500">Vous avez deja un compte ?</a>
                         </div>
                     </div>
                     <div>

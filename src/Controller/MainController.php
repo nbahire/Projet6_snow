@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Trick;
 use App\Form\CommentFormType;
+use App\Form\TrickFormType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,13 +35,14 @@ class MainController extends AbstractController
         $form = $this->createForm(TrickFormType::class, $trick, ['method' => 'PUT']);
         $form->handleRequest($request);
 
-        return $this->render('tricks/edit.html.twig', ['trick' => $trick, 'form' => $form->createView()]);
+        return $this->render('tricks/create.html.twig', ['trick' => $trick, 'form' => $form->createView()]);
     }
 
     #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_show', methods:["GET","POST"])]
     public function show(Request $request, Trick $trick, EntityManagerInterface $em): Response
     {
         $comment = new Comment;
+        $comments = $trick->getComment();
         $comment->setTrick($trick);
         $request->getSession()->set('referer', $request->getUri());
         $form = $this->createForm(CommentFormType::class, $comment);
@@ -54,7 +56,7 @@ class MainController extends AbstractController
 
         }
 
-        return $this->render('tricks/show.html.twig',['trick'=>$trick,'form' => $form->createView()]);
+        return $this->render('tricks/show.html.twig',['trick'=>$trick,'comments'=>$comments,'form' => $form->createView()]);
     }
 
     #[Route('/tricks/{id<[0-9]+>}/edit', name:'app_trick_edit', methods:['GET', 'PUT'])]
@@ -70,6 +72,8 @@ class MainController extends AbstractController
 
             return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
         }
+        return $this->render('tricks/edit.html.twig',['trick'=>$trick,'form' => $form->createView()]);
+
     }
 
     #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_delete', methods:['DELETE'])]
