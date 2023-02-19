@@ -1,0 +1,11 @@
+<h1>Salut! Veuillez confirmer votre email!</h1>
+
+<p>
+    Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant: <br><br>
+    <a href="{{ absolute_url(path('app_verify_email', {token: token}))}}">Confirmer mon e-mail</a>.
+    Ce lien expirera dans 3 heures.
+</p>
+
+<p>
+    Merci!
+</p>
