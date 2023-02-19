@@ -4,31 +4,36 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Security\UserAuthenticator;
+use App\Service\JwtService;
+use App\Service\SendMailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    private EmailVerifier $emailVerifier;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    public function __construct()
     {
-        $this->emailVerifier = $emailVerifier;
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, UserAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        UserAuthenticatorInterface $userAuthenticator,
+        UserAuthenticator $authenticator,
+        EntityManagerInterface $entityManager,
+        SendMailService $mailService,
+        JwtService $jwt
+    ): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -47,16 +52,27 @@ class RegistrationController extends AbstractController
             ;
             $entityManager->persist($user);
             $entityManager->flush();
+            // On génère le jwt de l'utilisateur
+            // On crée le header
+            $header = [
+                'typ' => 'JWT',
+                'alg' => 'HS256'
+            ];
 
-            // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('no_reply@snowtricks.com', 'SnowTrick Mail Bot'))
-                    ->to($user->getEmail())
-                    ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+            //On crée le payload
+            $payload = [
+                'user_id' => $user->getId()
+            ];
+            //On génère le token
+            $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret') );
+
+            $mailService->send(
+                'no_reply@snowtricks.com',
+                $user->getEmail(),
+                'Activation de votre compte sur snowTricks',
+                'confirmation_email',
+                    compact('user', 'token'),
             );
-            // do anything else you need here, like send an email
 
             return $userAuthenticator->authenticateUser(
                 $user,
@@ -70,22 +86,81 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
+    #[Route('/verify/{token}', name: 'app_verify_email')]
+    public function verifyUser($token, JwtService $jwtService, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // On vérifie si le token est valide, n'a pas expiré et n'a pas été modifié
+     if($jwtService->isValid($token) &&
+        !$jwtService->isExpired($token) &&
+        $jwtService->checkSignature($token, $this->getParameter('app.jwtsecret'))
+     )
+     {
+        // On récupère le payload
+         $payload = $jwtService->getPayload($token);
 
-        // validate email confirmation link, sets User::isVerified=true and persists
-        try {
-            $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
-        } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+         // On récupère le user du token
+         $user = $userRepository->find($payload['user_id']);
 
-            return $this->redirectToRoute('app_register');
-        }
+         // On verifie que l'utilisateur existe et que son compte n'est pas active
 
-        $this->addFlash('success', 'Your email address has been verified.');
+         if ($user && !$user->isVerified()){
+             $user->setIsVerified(true);
+             $entityManager->flush($user);
+             $this->addFlash('green', 'Votre compte est activé');
+             return $this->redirectToRoute('app_main');
 
-        return $this->redirectToRoute('app_main');
+         }
+     }
+        $this->addFlash('red', 'Le token est invalide ou a expiré');
+        return $this->redirectToRoute('app_login');
+
     }
+
+    #[Route('/verify_resend', name: 'app_verify_email_resend')]
+    public function verifyUserResend(JwtService $jwtService, UserRepository $userRepository,SendMailService $mailService): Response
+    {
+         // On récupère le user
+         $user = $this->getUser();
+
+         // On verifie que l'utilisateur existe et que son compte n'est pas active
+
+         if (!$user){
+             $this->addFlash('red', 'Vous devez être connecté pour accéder à cette page');
+             return $this->redirectToRoute('app_login');
+
+         }
+
+        if($user->isVerified()){
+            $this->addFlash('blue', 'Votre compte est déja verifié');
+
+            return $this->redirectToRoute('app_main');
+
+        }
+        // On génère le jwt de l'utilisateur
+        // On crée le header
+        $header = [
+            'typ' => 'JWT',
+            'alg' => 'HS256'
+        ];
+
+        //On crée le payload
+        $payload = [
+            'user_id' => $user->getId()
+        ];
+        //On génère le token
+        $token = $jwtService->generate($header, $payload, $this->getParameter('app.jwtsecret') );
+
+        $mailService->send(
+            'no_reply@snowtricks.com',
+            $user->getEmail(),
+            'Activation de votre compte sur snowTricks',
+            'confirmation_email',
+            compact('user', 'token'),
+        );
+
+        $this->addFlash('green', 'Email de vérification envoyé');
+        return $this->redirectToRoute('app_main');
+
+    }
+
 }

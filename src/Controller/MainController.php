@@ -44,12 +44,10 @@ class MainController extends AbstractController
         $comment = new Comment;
         $comments = $trick->getComment();
         $comment->setTrick($trick);
-        $request->getSession()->set('referer', $request->getUri());
         $form = $this->createForm(CommentFormType::class, $comment);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $comment->setAuthor($this->getUser());
-            $trick->addComment($comment);
             $em->persist($comment);
             $em->flush();
             return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);

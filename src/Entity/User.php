@@ -35,10 +35,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $name = null;
 
     #[ORM\Column]
-    private \DateTimeImmutable $created_at ;
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\Column(type: 'boolean')]
-    private $isVerified = false;
+    private bool $isVerified = false;
+
+    #[ORM\Column(type: 'string', length: 100)]
+    private string $resetToken;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
@@ -137,12 +140,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     public function setCreatedAt(): self
     {
-        $this->created_at = new \DateTimeImmutable('now');;
+        $this->createdAt = new \DateTimeImmutable('now');;
 
         return $this;
     }
@@ -218,4 +221,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @param string $resetToken
+     * @return User
+     */
+    public function setResetToken(string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResetToken(): string
+    {
+        return $this->resetToken;
+    }
+
 }
