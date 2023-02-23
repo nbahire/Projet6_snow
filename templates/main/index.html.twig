@@ -18,43 +18,20 @@
             <p class="text-xl md:text-2xl text-gray-500">Bienvenue sur l'espace preferé des passionnés de la glisse</p>
         </div>
     </div>
-
-    <div class="container px-4 md:px-0 mx-auto">
-        <div class="mx-0 sm:mx-6">
-            <div class="bg-gray-200 w-full text-xl md:text-2xl text-gray-800 leading-normal rounded-t">
-                <div class="flex flex-wrap justify-between py-12">
-                    {% for trick in tricks %}
-                        <!--1/5 col -->
-                        <div class="w-full md:w-1/5 p-6 flex flex-col flex-grow flex-shrink">
-                            <div class="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow-lg">
-                                <a href="{{path('app_trick_show', {id: trick.id} )}}" class="flex flex-wrap no-underline hover:no-underline">
-                                    <img src="https://source.unsplash.com/collection/3657445/800x600" class="h-full w-full rounded-t pb-6">
-                                </a>
-                                <div class="flex sm:justify-between py-2 sm:mt-0">
-                                    <a href="{{path('app_trick_show', {id: trick.id} )}}" class="flex flex-wrap no-underline hover:no-underline">
-                                        <div class="w-full font-bold text-xl text-gray-900 px-2">{{trick.title}}</div>
-                                    </a>
-                                    {% if app.user %}
-                                        <div class="px-4 text-xl">
-                                            <a href="{{path('app_trick_edit', {id: trick.id})}}" class="text-red-800 ">
-                                                <i class="fa-solid fa-pencil"></i>
-                                            </a>
-                                            <a  href="{{path('app_trick_delete', {id: trick.id})}}" onclick="event.preventDefault(); confirm('Etes-vous sur ?')&& document.getElementById('trick-delete').submit();" class="text-cyan-800 ">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </a>
-                                            <form id="trick-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
-                                                <input type="hidden" name="csrf_token" value="{{csrf_token('trick_deletion_'~ trick.id)}}">
-                                                <input type="hidden" name="_method" value="DELETE">
-                                            </form>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
+    <div class="container py-4 px-4 md:px-0 mx-auto rounded">
+        <div class="mx-0 sm:mx-6" id="content">
         </div>
-    </div>
+        <div class="w-full p-6 flex justify-center">
+            <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <i class="fa-duotone fa-loader"></i>
+                </span>
+                Afficher plus
 
+            </button>
+
+        </div>
+        </div>
+    <input  class="page" type="hidden" name="page" value="{{ tricks.page }}">
+    <input class="limit" type="hidden" name="limit" value="{{ tricks.pages }}">
 {% endblock %}

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -38,6 +39,39 @@ class CommentRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function findCommentPaginated(int $trick, int $page, int $limit = 2): array
+    {
+        $limit= abs($limit);
+
+        $result = [];
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->select('c')
+            ->from('App\Entity\Comment', 'c')
+            ->where(sprintf('c.trick = %s', $trick))
+            ->setMaxResults($limit)
+            ->setFirstResult(($page * $limit) - $limit)
+        ;
+        $paginator = new Paginator($query);
+        $data = $paginator->getQuery()->getResult();
+        // On vérifie la presence de données
+        if (empty($data)){
+            return $result;
+        }
+
+        // On calcule le nb de pages
+        $pages = ceil($paginator->count() / $limit);
+
+        //On remplie le tableau
+        $result['data'] = $data;
+        $result['page'] = $page;
+        $result['pages'] = $pages;
+        $result['limit'] = $limit;
+
+
+        return $result;
+    }
+
 
 //    /**
 //     * @return Comment[] Returns an array of Comment objects

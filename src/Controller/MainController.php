@@ -6,9 +6,11 @@ use App\Entity\Comment;
 use App\Entity\Trick;
 use App\Form\CommentFormType;
 use App\Form\TrickFormType;
+use App\Repository\CommentRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,9 +19,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class MainController extends AbstractController
 {
     #[Route('/', name: 'app_main')]
-    public function index(TrickRepository $trickRepository): Response
+    public function index(TrickRepository $trickRepository, Request $request): Response
     {
-        $tricks = $trickRepository->findAll();
+        //On cherche le numero de page dans l'url
+        $page = $request->query->getInt('page', 1);
+        $tricks = $trickRepository->findTricksPaginated($page);
+        if($request->get('ajax')){
+            return new JsonResponse(
+                ['content' => $this->renderView('layouts/_content.html.twig', compact('tricks'))]
+            );
+        }
         return $this->render('main/index.html.twig', compact('tricks'));
     }
     #[Route('/user', name: 'app_user')]
@@ -39,10 +48,9 @@ class MainController extends AbstractController
     }
 
     #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_show', methods:["GET","POST"])]
-    public function show(Request $request, Trick $trick, EntityManagerInterface $em): Response
+    public function show(Request $request, Trick $trick, EntityManagerInterface $em, CommentRepository $commentRepository): Response
     {
         $comment = new Comment;
-        $comments = $trick->getComment();
         $comment->setTrick($trick);
         $form = $this->createForm(CommentFormType::class, $comment);
         $form->handleRequest($request);
@@ -53,8 +61,17 @@ class MainController extends AbstractController
             return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
 
         }
+        //On cherche le numero de page dans l'url
+        $page = $request->query->getInt('page', 1);
+        $comments = $commentRepository->findCommentPaginated($trick->getId(), $page);
 
-        return $this->render('tricks/show.html.twig',['trick'=>$trick,'comments'=>$comments,'form' => $form->createView()]);
+        if($request->get('ajax')){
+            return new JsonResponse(
+                ['content' => $this->renderView('layouts/_comment.html.twig', compact('comments'))]
+            );
+        }
+
+        return $this->render('tricks/show.html.twig',['trick'=>$trick,'comments'=>$comments,'form' => $form->createView(), '']);
     }
 
     #[Route('/tricks/{id<[0-9]+>}/edit', name:'app_trick_edit', methods:['GET', 'PUT'])]
