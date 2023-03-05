@@ -10,6 +10,15 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            <script src="https://cdn.tiny.cloud/1/70e6jobl7u7xxhwzi187ucfmlkd9zmy8tr29fh36wmfqzeaw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+            <script>
+                tinymce.init({
+                    selector: '#mytextarea',
+                    language: 'fr_FR',
+                    height: "300"
+                });
+            </script>
+
         {% endblock %}
     </head>
     <body class="bg-white font-sans leading-normal tracking-normal">

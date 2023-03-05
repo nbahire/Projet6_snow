@@ -14,7 +14,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     mariadb-client \
     libpng-dev \
+    libwebp-dev \
     libjpeg62-turbo-dev \
+    libxpm-dev \
     libfreetype6-dev \
     locales \
     zip \
@@ -25,11 +27,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     nodejs
 
-# Clear cache
+RUN docker-php-ext-configure gd      --with-webp      --with-jpeg      --with-freetype
+
+#Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql  gd
+
 RUN npm install -g -y yarn
 
 # Install composer
