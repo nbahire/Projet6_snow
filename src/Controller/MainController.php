@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Image;
 use App\Entity\Trick;
 use App\Form\CommentFormType;
 use App\Form\TrickFormType;
 use App\Repository\CommentRepository;
 use App\Repository\TrickRepository;
+use App\Service\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class MainController extends AbstractController
 {
@@ -35,16 +38,6 @@ class MainController extends AbstractController
     public function user(): Response
     {
         return $this->render('users/user.html.twig', []);
-    }
-
-    #[Route('/tricks/create', name:'app_trick_create', methods:['GET', 'PUT'])]
-    #[IsGranted("ROLE_USER")]
-    public function create(Request $request, EntityManagerInterface $em, Trick $trick): Response
-    {
-        $form = $this->createForm(TrickFormType::class, $trick, ['method' => 'PUT']);
-        $form->handleRequest($request);
-
-        return $this->render('tricks/create.html.twig', ['trick' => $trick, 'form' => $form->createView()]);
     }
 
     #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_show', methods:["GET","POST"])]
@@ -74,33 +67,108 @@ class MainController extends AbstractController
         return $this->render('tricks/show.html.twig',['trick'=>$trick,'comments'=>$comments,'form' => $form->createView(), '']);
     }
 
-    #[Route('/tricks/{id<[0-9]+>}/edit', name:'app_trick_edit', methods:['GET', 'PUT'])]
+    #[Route('/tricks/create', name:'app_trick_create')]
     #[IsGranted("ROLE_USER")]
-    public function edit(Request $request, EntityManagerInterface $em, Trick $trick): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService): Response
     {
-        $form = $this->createForm(TrickFormType::class, $trick, ['method' => 'PUT']);
+        $trick = new Trick();
+        $form = $this->createForm(TrickFormType::class, $trick);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-            $this->addFlash('success', 'Trick édité avec succes!');
+            //On recupere les images
+            $images = $form->get('images')->getData();
+            foreach ($images as $image) {
+                //on definie le dossier de destination
+                $folder = 'tricks';
 
-            return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+                //On appelle le service d'ajout
+                $file = $pictureService->add($image, $folder, 300, 300);
+                $img = new Image();
+                $img->setUrl($file);
+                $trick->addImage($img);
+            }
+            $trick->setAuthor($this->getUser());
+            $trick->setTitle($form->get('title')->getData());
+            $trick->setContent($form->get('content')->getData());
+            $trick->setSlug(strtolower($slugger->slug($trick->getTitle())));
+            $entityManager->persist($trick);
+            $entityManager->flush();
+
+            $this->addFlash('green', 'Trick ajouté avec succes');
+
+            return $this->redirectToRoute('app_main');
+
         }
-        return $this->render('tricks/edit.html.twig',['trick'=>$trick,'form' => $form->createView()]);
+        return $this->render('tricks/create.html.twig', ['trick' => $trick, 'trickCreateForm' => $form->createView()]);
+    }
+
+    #[Route('/tricks/{id}/edit', name:'app_trick_edit')]
+    #[IsGranted("ROLE_USER")]
+    public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService): Response
+    {
+        $form = $this->createForm(TrickFormType::class, $trick);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            //On recupere les images
+            $images = $form->get('images')->getData();
+            foreach ($images as $image) {
+                //on definie le dossier de destination
+                $folder = 'tricks';
+
+                //On appelle le service d'ajout
+                $file = $pictureService->add($image, $folder, 300, 300);
+                $img = new Image();
+                $img->setUrl($file);
+                $trick->addImage($img);
+            }
+            $trick->setAuthor($this->getUser());
+            $trick->setTitle($form->get('title')->getData());
+            $trick->setContent($form->get('content')->getData());
+            $trick->setSlug(strtolower($slugger->slug($trick->getTitle())));
+            $entityManager->persist($trick);
+            $entityManager->flush();
+
+            $this->addFlash('green', 'Trick modifié avec succes');
+
+            return $this->redirectToRoute('app_main');
+
+        }
+
+        return $this->render('tricks/edit.html.twig', ['trick' => $trick, 'trickCreateForm' => $form->createView()]);
 
     }
 
-    #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_delete', methods:['DELETE'])]
+    #[Route('delete/tricks/{id}', name:'app_trick_delete', methods:['DELETE'])]
     #[IsGranted("ROLE_USER")]
     public function delete(Request $request, EntityManagerInterface $em, Trick $trick): Response
     {
         if ($this->isCsrfTokenValid('trick_deletion_' . $trick->getId(), $request->request->get('csrf_token'))) {
             $em->remove($trick);
             $em->flush();
-            $this->addFlash('info', 'Trick supprimé avec succes !');
+            $this->addFlash('green', 'Trick supprimé avec succes !');
         }
         return $this->redirectToRoute('app_main');
+    }
+
+    #[Route('delete/image/{id}', name:'app_image_delete', methods:['DELETE'])]
+    #[IsGranted("ROLE_USER")]
+    public function deleteImage(Request $request, EntityManagerInterface $em, Image $image, PictureService $pictureService): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if ($this->isCsrfTokenValid('delete' . $image->getId(), $data['_token'])) {
+            $name = $image->getUrl();
+            if ($pictureService->delete($name,'tricks', 300, 300)){
+                //On supprime l'image
+                $em->remove($image);
+                $em->flush();
+                $this->addFlash('green', 'Trick supprimé avec succes !');
+                return new JsonResponse(['success' => true], 200);
+
+            }
+            return new JsonResponse(['error' => 'Erreur de suppression'], 400);
+        }
+        return new JsonResponse(['error' => 'Token invalide'], 400);
     }
 
 }

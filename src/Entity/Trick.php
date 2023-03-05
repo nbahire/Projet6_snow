@@ -2,18 +2,13 @@
 
 namespace App\Entity;
 
-use App\Entity\traits\Timestamp;
 use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
-use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
-#[Uploadable]
 class Trick
 {
     #[ORM\Id]
@@ -24,17 +19,14 @@ class Trick
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $chapo = null;
-
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Image::class, orphanRemoval: true)]
-    private Collection $image;
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Image::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $images;
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Video::class, orphanRemoval: true)]
-    private Collection $video;
+    private Collection $videos;
 
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     #[ORM\JoinColumn(nullable: false)]
@@ -52,10 +44,14 @@ class Trick
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
+
     public function __construct()
     {
-        $this->image = new ArrayCollection();
-        $this->video = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->images = new ArrayCollection();
+        $this->videos = new ArrayCollection();
         $this->comment = new ArrayCollection();
     }
 
@@ -72,18 +68,6 @@ class Trick
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getChapo(): ?string
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo(string $chapo): self
-    {
-        $this->chapo = $chapo;
 
         return $this;
     }
@@ -105,13 +89,13 @@ class Trick
      */
     public function getImage(): Collection
     {
-        return $this->image;
+        return $this->images;
     }
 
     public function addImage(Image $image): self
     {
-        if (!$this->image->contains($image)) {
-            $this->image->add($image);
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
             $image->setTrick($this);
         }
 
@@ -120,7 +104,7 @@ class Trick
 
     public function removeImage(Image $image): self
     {
-        if ($this->image->removeElement($image)) {
+        if ($this->images->removeElement($image)) {
             // set the owning side to null (unless already changed)
             if ($image->getTrick() === $this) {
                 $image->setTrick(null);
@@ -135,13 +119,13 @@ class Trick
      */
     public function getVideo(): Collection
     {
-        return $this->video;
+        return $this->videos;
     }
 
     public function addVideo(Video $video): self
     {
-        if (!$this->video->contains($video)) {
-            $this->video->add($video);
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
             $video->setTrick($this);
         }
 
@@ -150,7 +134,7 @@ class Trick
 
     public function removeVideo(Video $video): self
     {
-        if ($this->video->removeElement($video)) {
+        if ($this->videos->removeElement($video)) {
             // set the owning side to null (unless already changed)
             if ($video->getTrick() === $this) {
                 $video->setTrick(null);
@@ -246,6 +230,18 @@ class Trick
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }
