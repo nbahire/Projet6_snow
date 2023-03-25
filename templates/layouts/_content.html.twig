@@ -1,0 +1,33 @@
+<div class="bg-gray-200 w-full text-xl md:text-2xl text-gray-800 leading-normal">
+    <div class="flex flex-wrap justify-between py-12">
+        {% for trick in tricks.data %}
+
+            <!--1/5 col -->
+            <div class="w-full md:w-1/5 p-6 flex flex-col flex-grow flex-shrink">
+                <div class="flex-1 bg-white rounded overflow-hidden shadow-lg">
+                    <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">
+                        <img src="https://source.unsplash.com/collection/3657445/800x600" class="h-full w-full rounded-t pb-6">
+                    </a>
+                    <div class="flex sm:justify-between py-2 sm:mt-0">
+                        <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">
+                            <div class="w-full font-bold text-xl text-gray-900 px-2">{{trick.title}}</div>
+                        </a>
+                        {% if app.user %}
+                            <div class="px-4 text-xl flex">
+                                <a href="{{path('app_trick_edit', {slug: trick.slug})}}" class="text-red-800 m-2">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_trick_delete', {'id': trick.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce trick?');" class="m-2">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('trick_deletion_' ~ trick.id) }}">
+                                    <button class="text-cyan-800 btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

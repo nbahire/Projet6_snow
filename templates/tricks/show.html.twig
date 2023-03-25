@@ -10,35 +10,28 @@
 <div class="container mx-auto -mt-32">
 
     <div class="mx-0 sm:mx-6">
-
         <!--Title-->
         <div class="text-center my-5 pt-16 md:pt-32">
-            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900">/</span> GETTING STARTED</p>
-            <h1 class="font-bold break-normal text-3xl md:text-5xl">Welcome to Ghostwind CSS</h1>
+            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name|raw }}</p>
+            <h1 class="font-bold break-normal text-3xl md:text-5xl mb-3">{{ trick.title|raw }}</h1>
+        </div>
+        <div class="bg-gray-200 flex flex-row justify-between text-center p-4">
+            {% for image in trick.image %}
+                <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
+                    <img class="max-w-xs transition duration-300 ease-in-out hover:scale-110" src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
+                </div>
+            {% endfor %}
         </div>
 
         <div class="bg-white text-center w-full p-8 md:p-24 text-xl md:text-2xl text-gray-800 leading-normal" style="font-family:Georgia,serif;">
-            <p class="text-2xl md:text-3xl mb-5">{{ trick.chapo }}</p>
-            <p class="py-6">{{ trick.content }}</p>
-            {% if app.user %}
-                <div class="pt-3">
-                    <a href="{{path('app_trick_edit', {id: trick.id})}}" class=" btn btn-light ">Editer</a>
-
-                    <a href="#" onclick="event.preventDefault(); confirm('Are you sure ?')&& document.getElementById('post-delete').submit();" class=" btn btn-light ">Supprimer</a>
-
-                    <form id="post-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
-                        <input type="hidden" name="csrf_token" value="{{csrf_token('trick_deletion_'~ trick.id)}}">
-                        <input type="hidden" name="_method" value="DELETE">
-                    </form>
-                </div>
-            {% endif %}
+            <p class="py-6">{{ trick.content|raw }}</p>
         </div>
 
         <!--Author-->
         <div class="flex w-full items-center font-sans p-8 md:p-24">
             <img class="w-10 h-10 rounded-full mr-4" src="http://i.pravatar.cc/300" alt="Avatar of Author">
             <div class="flex-1">
-                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name }}</p>
+                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name|raw }}</p>
             </div>
             <div class="justify-end">
                 <button class="bg-transparent border border-gray-500 hover:border-green-500 text-xs text-gray-500 hover:text-green-500 font-bold py-2 px-4 rounded-full">Read More</button>
@@ -46,61 +39,52 @@
         </div>
         <!--/Author-->
             {% if app.user %}
-                <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center">
-                    <h2 class="font-bold break-normal text-2xl md:text-4xl">Laisser un commentaire</h2>
-                    <div class="text-center pt-4">
-                        {{form_start(form)}}
-                        <div class=" mx-auto p-1 pr-0 flex justify-center">
-                            {{form_row(form.content, { 'attr': {'class' : 'p-2.5 text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}})}}
-                            <button type="submit" class=" ml-4 md:inline-block bg-green-500 text-white text-base font-semibold tracking-wider uppercase py-4 rounded shadow hover:bg-green-400 p-2">Commenter</button>
-                        </div>
-                        {{form_end(form)}}
+                <h2 class="font-bold break-normal text-2xl text-center md:text-4xl">Laisser un commentaire</h2>
+                <div class="text-center pt-4">
+                    {{form_start(form)}}
+                    <div class=" mx-auto p-1 pr-0 flex justify-center">
+                        {{form_row(form.content, { 'attr': {'class' : 'text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}})}}
+                        <button type="submit" class=" ml-4 md:inline-block bg-green-500 text-white text-base font-semibold tracking-wider uppercase py-4 rounded shadow hover:bg-green-400 p-2">Commenter</button>
                     </div>
-
-                    {% for comment in comments %}
-
-                        <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg">
-                            <div class="relative flex gap-4">
-                                <img src="https://icons.iconarchive.com/icons/diversity-avatars/avatars/256/charlie-chaplin-icon.png" class="relative rounded-lg -top-8 -mb-4 bg-white border h-20 w-20" alt="" loading="lazy">
-                                <div class="flex flex-col w-full">
-                                    <div class="flex flex-row justify-between">
-                                        <p class="relative text-xl whitespace-nowrap truncate overflow-hidden">{{ comment.author.name }}</p>
-                                        <a class="text-gray-500 text-xl" href="#"><i class="fa-solid fa-trash"></i></a>
-                                    </div>
-                                    <p class="text-gray-400 text-sm">20 April 2022, at 14:88 PM</p>
-                                </div>
-                            </div>
-                            <p class="-mt-4 text-gray-500">{{ comment.content }}</p>
-                        </div>
-                    {% endfor %}
-
+                    {{form_end(form)}}
                 </div>
+                {% if comments %}
+
+                    <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center" id="content">
+                    <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg" >
+                    </div>
+                </div>
+                <div class="w-full p-6 flex justify-center">
+                    <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <i class="fa-duotone fa-loader"></i>
+                        </span>
+                        Afficher plus
+                    </button>
+                </div>
+                    <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
+                    <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
+                {% endif %}
             {% else %}
-            <div class="container mx-auto max-w-6xl font-sans bg-green-100 rounded mt-8 p-2 md:p-24 text-center">
-                <p class="mb-8" >
+                <p class="mb-8b text-center" >
                     <a href="{{ path('app_login')}}" class="text-blue-500">
                         <i class="fas fa-sign-in-alt"></i>
                         Connectez-vous
                     </a>
                     pour commenter
                 </p>
+                {% if comments %}
 
-                {% for comment in comments %}
-
-                <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg">
-                    <div class="relative flex justify-between gap-4">
-                        <img src="https://icons.iconarchive.com/icons/diversity-avatars/avatars/256/charlie-chaplin-icon.png" class="relative rounded-lg -top-8 -mb-4 bg-white border h-20 w-20" alt="" loading="lazy">
-                        <div class="flex flex-col w-full">
-                            <div class="flex flex-row justify-between">
-                                <p class="relative text-xl whitespace-nowrap truncate overflow-hidden">{{ comment.author.name }}</p>
-                            </div>
-                            <p class="text-gray-400 text-sm">{{ comment.createdAt|date("m/d/Y", "Europe/Paris")  }}</p>
-                        </div>
-                    </div>
-                    <p class="-mt-4 text-gray-500">{{ comment.content }}</p>
+                <div class="container mx-auto max-w-6xl font-sans bg-green-100 rounded mt-8 p-2 md:p-24 text-center" id="content" >
                 </div>
-                {% endfor %}
-            </div>
+                <div class="w-full p-6 flex justify-center">
+                    <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Afficher plus
+                    </button>
+                </div>
+                    <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
+                    <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
+                {% endif %}
             {% endif %}
     </div>
 
