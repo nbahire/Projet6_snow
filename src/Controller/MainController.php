@@ -40,7 +40,7 @@ class MainController extends AbstractController
         return $this->render('users/user.html.twig', []);
     }
 
-    #[Route('/tricks/{id<[0-9]+>}', name:'app_trick_show', methods:["GET","POST"])]
+    #[Route('/tricks/{slug}', name:'app_trick_show', methods:["GET","POST"])]
     public function show(Request $request, Trick $trick, EntityManagerInterface $em, CommentRepository $commentRepository): Response
     {
         $comment = new Comment;
@@ -67,7 +67,7 @@ class MainController extends AbstractController
         return $this->render('tricks/show.html.twig',['trick'=>$trick,'comments'=>$comments,'form' => $form->createView(), '']);
     }
 
-    #[Route('/tricks/create', name:'app_trick_create')]
+    #[Route('/tricks-add', name:'app_trick_create')]
     #[IsGranted("ROLE_USER")]
     public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService): Response
     {
@@ -88,8 +88,6 @@ class MainController extends AbstractController
                 $trick->addImage($img);
             }
             $trick->setAuthor($this->getUser());
-            $trick->setTitle($form->get('title')->getData());
-            $trick->setContent($form->get('content')->getData());
             $trick->setSlug(strtolower($slugger->slug($trick->getTitle())));
             $entityManager->persist($trick);
             $entityManager->flush();
@@ -102,7 +100,7 @@ class MainController extends AbstractController
         return $this->render('tricks/create.html.twig', ['trick' => $trick, 'trickCreateForm' => $form->createView()]);
     }
 
-    #[Route('/tricks/{id}/edit', name:'app_trick_edit')]
+    #[Route('/tricks/{slug}/edit', name:'app_trick_edit')]
     #[IsGranted("ROLE_USER")]
     public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService): Response
     {
@@ -122,8 +120,6 @@ class MainController extends AbstractController
                 $trick->addImage($img);
             }
             $trick->setAuthor($this->getUser());
-            $trick->setTitle($form->get('title')->getData());
-            $trick->setContent($form->get('content')->getData());
             $trick->setSlug(strtolower($slugger->slug($trick->getTitle())));
             $entityManager->persist($trick);
             $entityManager->flush();
@@ -138,15 +134,16 @@ class MainController extends AbstractController
 
     }
 
-    #[Route('delete/tricks/{id}', name:'app_trick_delete', methods:['DELETE'])]
+    #[Route('delete/tricks/{id}', name:'app_trick_delete')]
     #[IsGranted("ROLE_USER")]
-    public function delete(Request $request, EntityManagerInterface $em, Trick $trick): Response
+    public function delete(Request $request, EntityManagerInterface $em, Trick $trick, Comment $comment): Response
     {
-        if ($this->isCsrfTokenValid('trick_deletion_' . $trick->getId(), $request->request->get('csrf_token'))) {
+        if ($this->isCsrfTokenValid('trick_deletion_' . $trick->getId(), $request->request->get('_token'))) {
             $em->remove($trick);
             $em->flush();
-            $this->addFlash('green', 'Trick supprimé avec succes !');
         }
+        $this->addFlash('green', 'Trick supprimé avec succes !');
+
         return $this->redirectToRoute('app_main');
     }
 
@@ -162,7 +159,6 @@ class MainController extends AbstractController
                 //On supprime l'image
                 $em->remove($image);
                 $em->flush();
-                $this->addFlash('green', 'Trick supprimé avec succes !');
                 return new JsonResponse(['success' => true], 200);
 
             }

@@ -35,7 +35,7 @@ class Trick
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     private ?User $author = null;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comment;
 
     #[ORM\Column(nullable: true)]

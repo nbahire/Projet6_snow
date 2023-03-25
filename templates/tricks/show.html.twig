@@ -10,34 +10,28 @@
 <div class="container mx-auto -mt-32">
 
     <div class="mx-0 sm:mx-6">
-
         <!--Title-->
         <div class="text-center my-5 pt-16 md:pt-32">
-            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900">/</span> GETTING STARTED</p>
-            <h1 class="font-bold break-normal text-3xl md:text-5xl">Welcome to Ghostwind CSS</h1>
+            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name|raw }}</p>
+            <h1 class="font-bold break-normal text-3xl md:text-5xl mb-3">{{ trick.title|raw }}</h1>
+        </div>
+        <div class="bg-gray-200 flex flex-row justify-between text-center p-4">
+            {% for image in trick.image %}
+                <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
+                    <img class="max-w-xs transition duration-300 ease-in-out hover:scale-110" src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
+                </div>
+            {% endfor %}
         </div>
 
         <div class="bg-white text-center w-full p-8 md:p-24 text-xl md:text-2xl text-gray-800 leading-normal" style="font-family:Georgia,serif;">
-            <p class="py-6">{{ trick.content }}</p>
-            {% if app.user %}
-                <div class="pt-3">
-                    <a href="{{path('app_trick_edit', {id: trick.id})}}" class=" btn btn-light ">Editer</a>
-
-                    <a href="#" onclick="event.preventDefault(); confirm('Are you sure ?')&& document.getElementById('post-delete').submit();" class=" btn btn-light ">Supprimer</a>
-
-                    <form id="post-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
-                        <input type="hidden" name="csrf_token" value="{{csrf_token('trick_deletion_'~ trick.id)}}">
-                        <input type="hidden" name="_method" value="DELETE">
-                    </form>
-                </div>
-            {% endif %}
+            <p class="py-6">{{ trick.content|raw }}</p>
         </div>
 
         <!--Author-->
         <div class="flex w-full items-center font-sans p-8 md:p-24">
             <img class="w-10 h-10 rounded-full mr-4" src="http://i.pravatar.cc/300" alt="Avatar of Author">
             <div class="flex-1">
-                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name }}</p>
+                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name|raw }}</p>
             </div>
             <div class="justify-end">
                 <button class="bg-transparent border border-gray-500 hover:border-green-500 text-xs text-gray-500 hover:text-green-500 font-bold py-2 px-4 rounded-full">Read More</button>
@@ -54,7 +48,9 @@
                     </div>
                     {{form_end(form)}}
                 </div>
-                <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center" id="content">
+                {% if comments %}
+
+                    <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center" id="content">
                     <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg" >
                     </div>
                 </div>
@@ -68,6 +64,7 @@
                 </div>
                     <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
                     <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
+                {% endif %}
             {% else %}
                 <p class="mb-8b text-center" >
                     <a href="{{ path('app_login')}}" class="text-blue-500">
@@ -76,6 +73,7 @@
                     </a>
                     pour commenter
                 </p>
+                {% if comments %}
 
                 <div class="container mx-auto max-w-6xl font-sans bg-green-100 rounded mt-8 p-2 md:p-24 text-center" id="content" >
                 </div>
@@ -86,6 +84,7 @@
                 </div>
                     <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
                     <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
+                {% endif %}
             {% endif %}
     </div>
 

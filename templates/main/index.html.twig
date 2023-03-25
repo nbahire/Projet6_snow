@@ -3,7 +3,7 @@
 {% block title %}SnowTrick : Pour les passionnés de la glisse{% endblock %}
 
 {% block body %}
-    <div class="w-full m-0 p-0 bg-cover bg-bottom" style="background-image:url({{asset('images/cover.jpg')}}); height: 60vh; max-height:460px;">
+    <div class="w-full mb-4 p-0 bg-cover bg-bottom" style="background-image:url({{asset('images/cover-trick.jpg')}}); height: 90vh;">
         <div class="example-wrapper">
             {% for message in app.flashes('success') %}
                 <div class="alert alert-success" role="alert">{{ message }}</div>
@@ -16,6 +16,9 @@
                  Snowtrick
             </p>
             <p class="text-xl md:text-2xl text-gray-500">Bienvenue sur l'espace preferé des passionnés de la glisse</p>
+        </div>
+        <div>
+            <i class="fa-sharp fa-solid fa-arrow-down"></i>
         </div>
     </div>
     <div class="container py-4 px-4 md:px-0 mx-auto rounded">
@@ -32,6 +35,8 @@
 
         </div>
         </div>
-    <input  class="page" type="hidden" name="page" value="{{ tricks.page }}">
-    <input class="limit" type="hidden" name="limit" value="{{ tricks.pages }}">
+    {% if tricks %}
+        <input  class="page" type="hidden" name="page" value="{{ tricks.page }}">
+        <input class="limit" type="hidden" name="limit" value="{{ tricks.pages }}">
+    {% endif %}
 {% endblock %}

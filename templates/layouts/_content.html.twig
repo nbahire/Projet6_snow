@@ -5,24 +5,23 @@
             <!--1/5 col -->
             <div class="w-full md:w-1/5 p-6 flex flex-col flex-grow flex-shrink">
                 <div class="flex-1 bg-white rounded overflow-hidden shadow-lg">
-                    <a href="{{path('app_trick_show', {id: trick.id} )}}" class="flex flex-wrap no-underline hover:no-underline">
+                    <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">
                         <img src="https://source.unsplash.com/collection/3657445/800x600" class="h-full w-full rounded-t pb-6">
                     </a>
                     <div class="flex sm:justify-between py-2 sm:mt-0">
-                        <a href="{{path('app_trick_show', {id: trick.id} )}}" class="flex flex-wrap no-underline hover:no-underline">
+                        <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">
                             <div class="w-full font-bold text-xl text-gray-900 px-2">{{trick.title}}</div>
                         </a>
                         {% if app.user %}
-                            <div class="px-4 text-xl">
-                                <a href="{{path('app_trick_edit', {id: trick.id})}}" class="text-red-800 ">
+                            <div class="px-4 text-xl flex">
+                                <a href="{{path('app_trick_edit', {slug: trick.slug})}}" class="text-red-800 m-2">
                                     <i class="fa-solid fa-pencil"></i>
                                 </a>
-                                <a  href="{{path('app_trick_delete', {id: trick.id})}}" class="text-cyan-800 ">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                                <form id="trick-delete" action="{{path('app_trick_delete', {id: trick.id})}}" method="post" style="display:none;">
-                                    <input type="hidden" name="csrf_token" value="{{csrf_token('trick_deletion_'~ trick.id)}}">
-                                    <input type="hidden" name="_method" value="DELETE">
+                                <form method="post" action="{{ path('app_trick_delete', {'id': trick.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce trick?');" class="m-2">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('trick_deletion_' ~ trick.id) }}">
+                                    <button class="text-cyan-800 btn">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </form>
                             </div>
                         {% endif %}
