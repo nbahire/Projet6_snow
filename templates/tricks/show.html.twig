@@ -3,7 +3,21 @@
 {% block title %}SnowTrick : Pour les passionnés de la glisse{% endblock %}
 {% block body %}
 <!--slide in nav-->
-    <div class="container w-full mx-auto bg-white bg-cover rounded" style="background-image:url('https://source.unsplash.com/collection/1118905/'); height: 75vh;"></div>
+    <div class="w-full bg-white bg-cover" style="background-image:url('https://source.unsplash.com/collection/1118905/'); height: 75vh;">
+        {% if app.user %}
+            <div class="px-4 text-xl flex justify-end">
+                <a href="{{path('app_trick_edit', {slug: trick.slug})}}" class="text-red-800 m-2">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+                <form method="post" action="{{ path('app_trick_delete', {'id': trick.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce trick?');" class="m-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('trick_deletion_' ~ trick.id) }}">
+                    <button class="text-cyan-800 btn">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
 <!--image-->
 
 <!--Container-->
@@ -12,26 +26,34 @@
     <div class="mx-0 sm:mx-6">
         <!--Title-->
         <div class="text-center my-5 pt-16 md:pt-32">
-            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name|raw }}</p>
-            <h1 class="font-bold break-normal text-3xl md:text-5xl mb-3">{{ trick.title|raw }}</h1>
+            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name }}</p>
+            <h1 class="font-bold break-normal text-3xl md:text-5xl mb-3">{{ trick.title }}</h1>
         </div>
-        <div class="bg-gray-200 flex flex-row justify-between text-center p-4">
-            {% for image in trick.image %}
-                <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
-                    <img class="max-w-xs transition duration-300 ease-in-out hover:scale-110" src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
-                </div>
-            {% endfor %}
-        </div>
+        {% if trick.image or trick.video %}
+            <div class="bg-gray-200 flex flex-row justify-between text-center p-4">
+                {% for image in trick.image %}
+                        <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
+                                <img src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
+                        </div>
+                {% endfor %}
 
+                {% for video in trick.video %}
+
+                        <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
+                                <iframe width="100%" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="bg-white text-center w-full p-8 md:p-24 text-xl md:text-2xl text-gray-800 leading-normal" style="font-family:Georgia,serif;">
-            <p class="py-6">{{ trick.content|raw }}</p>
+            <p class="py-6">{{ trick.content}}</p>
         </div>
 
         <!--Author-->
         <div class="flex w-full items-center font-sans p-8 md:p-24">
             <img class="w-10 h-10 rounded-full mr-4" src="http://i.pravatar.cc/300" alt="Avatar of Author">
             <div class="flex-1">
-                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name|raw }}</p>
+                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name }}</p>
             </div>
             <div class="justify-end">
                 <button class="bg-transparent border border-gray-500 hover:border-green-500 text-xs text-gray-500 hover:text-green-500 font-bold py-2 px-4 rounded-full">Read More</button>
@@ -66,7 +88,7 @@
                     <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
                 {% endif %}
             {% else %}
-                <p class="mb-8b text-center" >
+                <p class="mb-8 text-center" >
                     <a href="{{ path('app_login')}}" class="text-blue-500">
                         <i class="fas fa-sign-in-alt"></i>
                         Connectez-vous

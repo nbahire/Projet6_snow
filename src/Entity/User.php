@@ -25,9 +25,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = ['ROLE_USER'];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -35,7 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $name = null;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt ;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;
@@ -97,7 +94,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRoles(array $roles): self
     {
-
         $this->roles = $roles;
 
         return $this;
@@ -121,10 +117,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getName(): ?string
@@ -146,7 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCreatedAt(): self
     {
-        $this->createdAt = new \DateTimeImmutable('now');;
+        $this->createdAt = new \DateTimeImmutable('now');
 
         return $this;
     }
@@ -223,22 +217,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @param string $resetToken
-     * @return User
-     */
     public function setResetToken(string $resetToken): self
     {
         $this->resetToken = $resetToken;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getResetToken(): string
     {
         return $this->resetToken;
     }
-
 }

@@ -19,7 +19,7 @@ class Image
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $alt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'image')]
+    #[ORM\ManyToOne(targetEntity: Trick::class, inversedBy: 'images')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Trick $trick = null;
 

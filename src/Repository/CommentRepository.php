@@ -42,7 +42,7 @@ class CommentRepository extends ServiceEntityRepository
 
     public function findCommentPaginated(int $trick, int $page, int $limit = 2): array
     {
-        $limit= abs($limit);
+        $limit = abs($limit);
 
         $result = [];
         $query = $this->getEntityManager()->createQueryBuilder()
@@ -55,46 +55,19 @@ class CommentRepository extends ServiceEntityRepository
         $paginator = new Paginator($query);
         $data = $paginator->getQuery()->getResult();
         // On vérifie la presence de données
-        if (empty($data)){
+        if (empty($data)) {
             return $result;
         }
 
         // On calcule le nb de pages
         $pages = ceil($paginator->count() / $limit);
 
-        //On remplie le tableau
+        // On remplie le tableau
         $result['data'] = $data;
         $result['page'] = $page;
         $result['pages'] = $pages;
         $result['limit'] = $limit;
 
-
         return $result;
     }
-
-
-//    /**
-//     * @return Comment[] Returns an array of Comment objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Comment
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

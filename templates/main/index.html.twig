@@ -3,7 +3,7 @@
 {% block title %}SnowTrick : Pour les passionnés de la glisse{% endblock %}
 
 {% block body %}
-    <div class="w-full mb-4 p-0 bg-cover bg-bottom" style="background-image:url({{asset('images/cover-trick.jpg')}}); height: 90vh;">
+    <div class="w-full bg-white bg-cover " style="background-image:url({{asset('images/cover-trick.jpg')}}); height: 90vh;">
         <div class="example-wrapper">
             {% for message in app.flashes('success') %}
                 <div class="alert alert-success" role="alert">{{ message }}</div>
@@ -12,31 +12,36 @@
 
         <div class="container max-w-4xl mx-auto pt-16 md:pt-32 text-center break-normal">
             <!--Title-->
-            <p class="text-white font-extra bold text-3xl md:text-5xl">
+            <p class="text-white mt-6 font-extra bold text-3xl md:text-5xl">
                  Snowtrick
             </p>
-            <p class="text-xl md:text-2xl text-gray-500">Bienvenue sur l'espace preferé des passionnés de la glisse</p>
-        </div>
-        <div>
-            <i class="fa-sharp fa-solid fa-arrow-down"></i>
+            <p class="text-xl md:text-2xl mt-8 text-rose-900">Bienvenue sur l'espace preferé des passionnés de la glisse</p>
         </div>
     </div>
-    <div class="container py-4 px-4 md:px-0 mx-auto rounded">
+    <div class="-mt-32 mb-4 mr-2 text-3xl md:text-5xl text-center flex justify-end">
+        <a href="#all">
+            <i class="fa-solid fa-arrow-down"></i>
+        </a>
+    </div>
+
+    <div id="all" class="container my-12 py-12 px-4 md:px-0 mx-auto rounded">
         <div class="mx-0 sm:mx-6" id="content">
         </div>
         <div class="w-full p-6 flex justify-center">
             <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <i class="fa-duotone fa-loader"></i>
-                </span>
                 Afficher plus
-
             </button>
+        </div>
+    </div>
 
-        </div>
-        </div>
     {% if tricks %}
         <input  class="page" type="hidden" name="page" value="{{ tricks.page }}">
         <input class="limit" type="hidden" name="limit" value="{{ tricks.pages }}">
     {% endif %}
+    <div class="my-12  mr-2 text-3xl md:text-5xl text-center flex justify-end">
+        <a href="#all">
+            <i class="fa-solid fa-arrow-up"></i>
+        </a>
+    </div>
+
 {% endblock %}

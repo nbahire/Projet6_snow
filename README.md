@@ -20,5 +20,4 @@ Pour verifier les pré-requis:
 
   ```bash
     docker compose up -d
-    symfony serve -d
  ```
