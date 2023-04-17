@@ -38,12 +38,6 @@ class MainController extends AbstractController
         return $this->render('main/index.html.twig', compact('tricks'));
     }
 
-    #[Route('/user', name: 'app_user', methods: ['GET', 'POST'])]
-    public function user(): Response
-    {
-        return $this->render('users/user.html.twig', []);
-    }
-
     #[Route('/tricks/{slug}', name: 'app_trick_show', methods: ['GET', 'POST'])]
     public function show(Request $request, Trick $trick, EntityManagerInterface $em, CommentRepository $commentRepository): Response
     {
@@ -86,7 +80,7 @@ class MainController extends AbstractController
             $videos = $form->get('video')->getData();
             $urls = explode(' ', $videos['url']);
             foreach ($urls as $url) {
-                if (!str_contains($url, 'https://www.youtube.com/watch?v=')) {
+                if (!empty($url) && !str_contains($url, 'https://www.youtube.com/watch?v=')) {
                     $this->addFlash('red', 'Seulement les liens youtube sont acceptés');
 
                     return $this->redirectToRoute('app_trick_create');
@@ -142,7 +136,7 @@ class MainController extends AbstractController
         return $this->render('tricks/edit.html.twig', ['trick' => $trick, 'trickCreateForm' => $form->createView()]);
     }
 
-    #[Route('delete/tricks/{id}', name: 'app_trick_delete', methods: ['DELETE'])]
+    #[Route('delete/tricks/{id}', name: 'app_trick_delete', methods: ['POST', 'DELETE'])]
     #[IsGranted('ROLE_USER')]
     public function delete(Request $request, EntityManagerInterface $em, Trick $trick): Response
     {
@@ -157,7 +151,7 @@ class MainController extends AbstractController
         return $this->redirectToRoute('app_main');
     }
 
-    #[Route('delete/image/{id}', name: 'app_image_delete', methods: ['DELETE'])]
+    #[Route('delete/image/{id}', name: 'app_image_delete', methods: ['DELETE', 'POST'])]
     #[IsGranted('ROLE_USER')]
     public function deleteImage(Request $request, EntityManagerInterface $em, Image $image, PictureService $pictureService): JsonResponse
     {

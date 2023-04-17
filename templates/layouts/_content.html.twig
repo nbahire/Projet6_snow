@@ -6,7 +6,7 @@
             <div class="md:w-full lg:w-1/5 p-6">
                 <div class="bg-white rounded overflow-hidden shadow-lg">
                     <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">
-                        <img src="https://source.unsplash.com/collection/3657445/800x600" class="h-full w-full rounded-t pb-6">
+                        <img src="{{ asset('images/uploads/tricks/mini/300x300-' ~ trick.image[0].url) }}" class="h-full w-full rounded-t pb-6">
                     </a>
                     <div class="flex sm:justify-between py-2 sm:mt-0">
                         <a href="{{path('app_trick_show', {slug: trick.slug} )}}" class="flex flex-wrap no-underline hover:no-underline">

@@ -4,3 +4,9 @@
 body {
     background-color: lightgray;
 }
+
+@media screen and (max-width: 640px) {
+    .bg-post{
+        height: 200px;
+    }
+}
