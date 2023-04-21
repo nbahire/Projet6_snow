@@ -10,6 +10,7 @@ snowTricks est un site ou on echange des figure de snowboard
     * Symfony CLI
     * Docker
     * Docker-compose
+    * node 16
 
 Pour verifier les pré-requis:
 
@@ -20,5 +21,10 @@ Pour verifier les pré-requis:
 
   ```bash
     docker compose up -d
-    symfony serve -d
  ```
+### Lancer le projet
+
+```bash
+    composer install
+    npm install && npm run build
+```

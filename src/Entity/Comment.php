@@ -9,7 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -59,6 +60,7 @@ class Comment
 
         return $this;
     }
+
     public function getTrick(): ?Trick
     {
         return $this->trick;

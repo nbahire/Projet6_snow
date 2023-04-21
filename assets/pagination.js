@@ -4,7 +4,10 @@ window.onload = () => {
     let limit = document.querySelector('.limit');
     if (page && limit){
         page.value = 1
-
+        const loadMore = document.querySelector('.load-more');
+        if(parseInt(limit.value) === 1){
+            loadMore.remove()
+        }
         fetch(Url.pathname + "?page=" + page.value.toString() + "&ajax=1", {
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
@@ -17,8 +20,6 @@ window.onload = () => {
                 content.innerHTML = data.content;
                 getDelete();
             }).catch(e => alert(e));
-
-        const loadMore = document.querySelector('.load-more');
         loadMore.addEventListener('click', () => {
             let nextPage = ++ page.value
 
@@ -43,6 +44,13 @@ window.onload = () => {
             }
         })
     }
+    const postMedias = document.querySelector('#post-medias');
+    const loadMedias = document.querySelector('.load-medias');
+    loadMedias.addEventListener('click', (e)=>{
+        e.preventDefault();
+        postMedias.classList.remove('md:hidden');
+        loadMedias.remove();
+    })
 }
 
  function getDelete() {

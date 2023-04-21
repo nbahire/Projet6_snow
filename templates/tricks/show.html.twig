@@ -1,91 +1,118 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SnowTrick : Pour les passionnés de la glisse{% endblock %}
+{% block title %}{{ trick.title }} - SnowTrick : Pour les passionnés de la glisse{% endblock %}
 {% block body %}
 <!--slide in nav-->
-    <div class="container w-full mx-auto bg-white bg-cover rounded" style="background-image:url('https://source.unsplash.com/collection/1118905/'); height: 75vh;"></div>
+        <div class="bg-post bg-no-repeat bg-center bg-cover" style="background-image:url({{ asset('images/uploads/tricks/' ~ trick.image[0].url) }});height: 500px;">
+            {% if app.user %}
+                <div class="px-4 text-xl flex justify-end">
+                    <a href="{{path('app_trick_edit', {slug: trick.slug})}}" class="text-cyan-800 m-2">
+                        <i class="rounded bg-white p-2 fa-solid fa-pencil"></i>
+                    </a>
+                    <form method="post" action="{{ path('app_trick_delete', {'id': trick.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce trick?');" class="m-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('trick_deletion_' ~ trick.id) }}">
+                        <button class="text-red-800 btn">
+                            <i class="rounded bg-white p-2 fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+            <!--Title-->
+            <div class="text-center pt-16">
+                <h1 class="font-bold break-normal text-rose-800 text-3xl md:text-5xl mt-8 pt-6">{{ trick.title }}</h1>
+            </div>
+        </div>
 <!--image-->
 
 <!--Container-->
-<div class="container mx-auto -mt-32">
+<div class="container mx-auto ">
 
-    <div class="mx-0 sm:mx-6">
-        <!--Title-->
-        <div class="text-center my-5 pt-16 md:pt-32">
-            <p class="text-sm md:text-base text-green-500 font-bold">{{ trick.createdAt|date("m/d/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name|raw }}</p>
-            <h1 class="font-bold break-normal text-3xl md:text-5xl mb-3">{{ trick.title|raw }}</h1>
+    <div class="mx-2">
+        {% if trick.image|length > 0 %}
+            <div class="w-full p-6 mt-8 flex justify-center ">
+            <button class="load-medias group relative lg:hidden flex md:w-1/6 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-xs font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Medias
+            </button>
         </div>
-        <div class="bg-gray-200 flex flex-row justify-between text-center p-4">
-            {% for image in trick.image %}
-                <div class="relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
-                    <img class="max-w-xs transition duration-300 ease-in-out hover:scale-110" src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
+            <div class="bg-gray-200  md:hidden lg:flex  w-full text-xl md:text-2xl text-gray-800 leading-normal" id="post-medias">
+                <div class="flex flex-wrap justify-between">
+                    {% for image in trick.image %}
+                        <div class="bg-gray-200 md:flex-column lg:flex-row justify-between text-center p-4">
+                            <div class="relative overflow-hidden bg-cover bg-no-repeat">
+                                <img src="{{ asset('images/uploads/tricks/mini/300x300-' ~ image.url) }}" alt="Images">
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% for video in trick.video %}
+                        <div class="bg-gray-200 md:flex-column lg:flex-row justify-between text-center p-4">
+                            <div class=" hidden md:inline-block relative overflow-hidden bg-cover bg-no-repeat">
+                                <iframe width="300" height="300" src="{{ video.url }}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        </div>
-
+            </div>
+        {%  endif %}
         <div class="bg-white text-center w-full p-8 md:p-24 text-xl md:text-2xl text-gray-800 leading-normal" style="font-family:Georgia,serif;">
-            <p class="py-6">{{ trick.content|raw }}</p>
+            <p class="py-6">{{ trick.content}}</p>
         </div>
-
         <!--Author-->
         <div class="flex w-full items-center font-sans p-8 md:p-24">
             <img class="w-10 h-10 rounded-full mr-4" src="http://i.pravatar.cc/300" alt="Avatar of Author">
             <div class="flex-1">
-                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name|raw }}</p>
-            </div>
-            <div class="justify-end">
-                <button class="bg-transparent border border-gray-500 hover:border-green-500 text-xs text-gray-500 hover:text-green-500 font-bold py-2 px-4 rounded-full">Read More</button>
+                <p class="text-base font-bold text-base md:text-xl leading-none">{{ trick.author.name }}</p>
             </div>
         </div>
-        <!--/Author-->
-            {% if app.user %}
-                <h2 class="font-bold break-normal text-2xl text-center md:text-4xl">Laisser un commentaire</h2>
-                <div class="text-center pt-4">
-                    {{form_start(form)}}
-                    <div class=" mx-auto p-1 pr-0 flex justify-center">
-                        {{form_row(form.content, { 'attr': {'class' : 'text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}})}}
-                        <button type="submit" class=" ml-4 md:inline-block bg-green-500 text-white text-base font-semibold tracking-wider uppercase py-4 rounded shadow hover:bg-green-400 p-2">Commenter</button>
-                    </div>
-                    {{form_end(form)}}
-                </div>
-                {% if comments %}
 
-                    <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center" id="content">
-                    <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg" >
-                    </div>
-                </div>
-                <div class="w-full p-6 flex justify-center">
-                    <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                            <i class="fa-duotone fa-loader"></i>
-                        </span>
-                        Afficher plus
-                    </button>
-                </div>
-                    <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
-                    <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
-                {% endif %}
-            {% else %}
-                <p class="mb-8b text-center" >
-                    <a href="{{ path('app_login')}}" class="text-blue-500">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Connectez-vous
-                    </a>
-                    pour commenter
-                </p>
-                {% if comments %}
+        <p class="text-sm my-5 py-5 md:text-base text-center text-green-500 font-bold">{{ trick.createdAt|date("d/m/Y", "Europe/Paris")  }}<span class="text-gray-900"> / </span>{{ trick.category.name }}</p>
 
-                <div class="container mx-auto max-w-6xl font-sans bg-green-100 rounded mt-8 p-2 md:p-24 text-center" id="content" >
+        {% if app.user %}
+            <h2 class="font-bold break-normal text-2xl text-center md:text-4xl">Laisser un commentaire</h2>
+            <div class="text-center pt-4">
+                {{form_start(form)}}
+                <div class=" mx-auto p-1 pr-0 flex justify-center">
+                    {{form_row(form.content, { 'attr': {'class' : 'text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}})}}
+                    <button type="submit" class=" ml-4 md:inline-block bg-green-500 text-white text-base font-semibold tracking-wider uppercase py-4 rounded shadow hover:bg-green-400 p-2">Commenter</button>
                 </div>
-                <div class="w-full p-6 flex justify-center">
-                    <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Afficher plus
-                    </button>
+                {{form_end(form)}}
+            </div>
+            {% if comments %}
+
+                <div class="container mx-auto w-full font-sans  max-w-6xl bg-green-100 rounded mt-8 p-4 md:p-24 text-center" id="content">
+                <div class="relative grid grid-cols-1 gap-4 p-4 mb-8 border rounded-lg bg-white shadow-lg" >
                 </div>
-                    <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
-                    <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
-                {% endif %}
+            </div>
+            <div class="w-full p-6 flex justify-center">
+                <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i class="fa-duotone fa-loader"></i>
+                    </span>
+                    Afficher plus
+                </button>
+            </div>
+                <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
+                <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
             {% endif %}
+        {% else %}
+            <p class="mb-8 text-center" >
+                <a href="{{ path('app_login')}}" class="text-blue-500">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Connectez-vous
+                </a>
+                pour commenter
+            </p>
+            {% if comments %}
+            <div class="container mx-auto max-w-6xl font-sans bg-green-100 rounded mt-8 p-2 md:p-24 text-center" id="content" >
+            </div>
+            <div class="w-full p-6 flex justify-center">
+                <button type="submit" class="load-more group relative flex md:w-1/5 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Afficher plus
+                </button>
+            </div>
+                <input  class="page" type="hidden" name="page" value="{{ comments.page }}">
+                <input class="limit" type="hidden" name="limit" value="{{ comments.pages }}">
+            {% endif %}
+        {% endif %}
     </div>
 
 </div>

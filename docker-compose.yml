@@ -68,3 +68,4 @@ services:
 networks:
   app_network:
     driver: bridge
+
