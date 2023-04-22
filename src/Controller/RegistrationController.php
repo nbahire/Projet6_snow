@@ -18,10 +18,6 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct()
-    {
-    }
-
     #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
@@ -45,6 +41,7 @@ class RegistrationController extends AbstractController
                 )
             )
                 ->setName($form->get('name')->getData())
+                ->setResetToken('')
                 ->setCreatedAt()
             ;
             $entityManager->persist($user);

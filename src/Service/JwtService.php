@@ -61,9 +61,7 @@ class JwtService
         $array = explode('.', $token);
 
         // On décode le payload
-        $header = json_decode(base64_decode($array[0]), true);
-
-        return $header;
+        return json_decode(base64_decode($array[0]), true);
     }
 
     // On verifie si le token a expiré

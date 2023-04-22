@@ -31,6 +31,14 @@
 
                             </div>
                         {% endfor %}
+                        {% for video in trick.video %}
+                            <div>
+                                <iframe width="300" height="300" src="{{ video.url }}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                <a  href="{{path('app_video_delete', {id: video.id})}}" data-delete data-token="{{ csrf_token('delete'~video.id) }}" class="text-cyan-800 ">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        {% endfor %}
                     </div>
 
                 </div>

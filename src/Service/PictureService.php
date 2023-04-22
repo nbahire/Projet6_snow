@@ -14,6 +14,9 @@ class PictureService
         $this->params = $params;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250): string
     {
         // On donne un nouveau nom a l'image
@@ -23,23 +26,16 @@ class PictureService
         $pictureData = getimagesize($picture);
 
         if (false === $pictureData) {
-            throw new \Exception('Format d\'images incorecte');
+            throw new \Exception('Format d\'images incorrecte');
         }
 
         // On verifie le format
-        switch ($pictureData['mime']) {
-            case 'image/png':
-                $pictureSource = imagecreatefrompng($picture);
-                break;
-            case 'image/jpeg':
-                $pictureSource = imagecreatefromjpeg($picture);
-                break;
-            case 'image/webp':
-                $pictureSource = imagecreatefromwebp($picture);
-                break;
-            default:
-                throw new \Exception('Format d\'images incorecte');
-        }
+        $pictureSource = match ($pictureData['mime']) {
+            'image/png' => imagecreatefrompng($picture),
+            'image/jpeg' => imagecreatefromjpeg($picture),
+            'image/webp' => imagecreatefromwebp($picture),
+            default => throw new \Exception('Format d\'images incorrecte'),
+        };
 
         // On recadre l'image
         $pictureWidth = $pictureData[0];
@@ -76,7 +72,7 @@ class PictureService
             mkdir($path.'/mini/', 0755, true);
         }
 
-        // On stoske l'image
+        // On stocke l'image
         imagewebp($resizedPicture, $path.'/mini/'.$width.'x'.$height.'-'.$file);
 
         $picture->move($path.'/', $file);

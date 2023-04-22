@@ -50,7 +50,9 @@ class MainController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
-            return $this->redirectToRoute('app_trick_show', ['id' => $trick->getId()]);
+            $this->addFlash('green', 'Commentaire ajouté avec succès');
+
+            return $this->redirectToRoute('app_trick_show', ['slug' => $trick->getSlug()]);
         }
         // On cherche le numero de page dans l'url
         $page = $request->query->getInt('page', 1);
@@ -146,7 +148,7 @@ class MainController extends AbstractController
             $em->remove($trick);
             $em->flush();
         }
-        $this->addFlash('green', 'Trick supprimé avec succes !');
+        $this->addFlash('green', 'Trick supprimé avec succès !');
 
         return $this->redirectToRoute('app_main');
     }
@@ -170,6 +172,24 @@ class MainController extends AbstractController
             }
 
             return new JsonResponse(['error' => 'Erreur de suppression'], 400);
+        }
+
+        return new JsonResponse(['error' => 'Token invalide'], 400);
+    }
+
+    #[Route('delete/video/{id}', name: 'app_video_delete', methods: ['DELETE', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function deleteVideo(Request $request, EntityManagerInterface $em, Video $video): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $videoId = $video->getId();
+
+        if ($this->isCsrfTokenValid(sprintf('delete%s', $videoId), $data['_token'])) {
+            $em->remove($video);
+            $em->flush();
+
+            return new JsonResponse(['success' => true], 200);
         }
 
         return new JsonResponse(['error' => 'Token invalide'], 400);
